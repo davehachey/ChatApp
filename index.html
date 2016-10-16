@@ -1,0 +1,247 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Ye Olde Tree</title>
+    </head>
+ 
+
+        <!-- BOOTSTRAP -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+        <!-- Your custom CSS -->
+        <link rel='stylesheet' type='text/css' href='css/style.css'>
+   
+
+        <!-- CODE YOUR HTML APP HERE! -->
+   
+
+        <!-- FIREBASE -->
+
+        <script src="https://www.gstatic.com/firebasejs/3.4.1/firebase.js"></script>
+        <script>
+          // Initialize Firebase
+        </script>
+
+        <!-- JQUERY -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+        <!-- BOOTSTRAP JS (for modal an other functions!) -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap-modal.min.js"></script>
+
+        <!-- Your main JS Script -->
+        <script src="js/app.js"></script>
+
+        <!-- header -->    
+    <body>
+
+
+        <div id="window-login">
+
+            <div class ="row">
+            <div class ="col-sm-12">
+                <h2>Welcome to:</h2>
+                <h1>Ye Olde Tree</h1>
+                <br></br>
+                <p>Stand a minute, under Ye Olde Tree, and debate the topics of the day.</p>
+                <br></br>
+            </div>
+            </div>
+
+        <!-- Facebook Login button window -->
+                <div class="row login-window">
+                <div class="col-sm-4 col-sm-offset-4">
+                    <button type="button" id="btn-login" class="btn btn-lg btn-block btn-primary">Login using Facebook
+                    </button>
+                </div>
+                </div>
+                <Br></Br>      
+
+        <!-- Twitter Login button window -->
+                <div class="row login-window">
+                <div class="col-sm-4 col-sm-offset-4">
+                    <button type="button" id="btn-logintw" class="btn btn-lg btn-block btn-primary">Login using Twitter
+                    </button>
+                </div>
+                </div>
+        </div>
+
+<!-- Main window -->
+        <div id ="window-main"  style="display:none">
+            <div class ="row">
+            <div class ="col-sm-12">
+                <h1>Meet at Ye Olde Tree for discourse</h1>
+                <br></br>
+                <table class="table table-striped table-inverse">
+                    <thead>
+                        <tr>
+                        <th>Available topic</th>
+                        <th>Looking for: Side</th>
+                        <th>'Looking for: Opponent Rating >'</th>
+                        <th>Min length (minutes)?</th>
+                        <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="available-topics">
+                    </tbody>
+                </table>
+            </div>
+            </div>
+              
+
+<!-- user createss subject, side, min rating and length of discussion -->
+            <div class="form-group row">
+                <label class="col-xs-2 col-form-label">Create a topic</label>
+                <div class="col-xs-9">
+                <input class="form-control" type="text" placeholder="Write a topic" id="new-chat-topic">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                    <label class="col-xs-2 col-form-label">Side</label>
+                <div class="col-xs-9">
+                    <input class="form-control" type="text" placeholder="For or against" id="new-chat-side">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-xs-2 col-form-label">Min rating</label>
+                <div class="col-xs-9">                
+                    <input class="form-control" type="text" placeholder="Must not be greater than your own" id="new-chat-rating">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-xs-2 col-form-label">Length</label>
+                <div class="col-xs-9">
+                    <input class="form-control" type="text" placeholder="In mins" id="new-chat-length">
+                </div>
+            </div>
+
+
+<!-- temp button to switch to chat page -->
+
+    <div class="row">
+        <div class="col-sm-4 col-sm-offset-4">
+            <button type="button" id="btn-new-chat" class="btn btn-lg btn-block btn-primary btn-danger">Create
+            </button>
+        </div>
+    </div>
+    <Br></Br>
+
+<!-- logout button -->
+
+    <div class="row">
+        <div class="col-sm-4 col-sm-offset-4">
+            <button type="button" id="btn-logout" class="btn btn-lg btn-block btn-primary btn-danger">logout
+            </button>
+        </div>
+    </div>
+    <Br></Br>
+
+
+<!-- number of online users -->
+
+    <p> <strong> Number of Users online </strong> </p>
+    <br></br>
+    <br></br>
+
+<!-- your profile -->
+    <div class="row">
+         <div class="col-sm-12"> 
+            <p>Your Profile</p>
+            <p>Conversations ended prematurely:</p>
+            <p>Your overall rating (with early ending penalties):</p>
+            <table class="table table-striped table-inverse">
+            <thead>
+                <tr>
+                <th>Topics</th>
+                <th>Side</th>
+                <th>Opp rating</th>
+                <th>Knowledge</th>
+                <th>Demeanor</th>   
+                <th>Humour</th>   
+                <th>Overall</th>
+
+
+                </tr>
+            </thead>
+            <tbody id="my-conversations">
+                <tr>
+                <th scope="row">Hillary Clinton is perfect</th>
+                <td>against</td>
+                <td>85</td>
+                <td>5</td>
+                </tr>
+                <tr>
+                <th scope="row">Gun control is stupid</th>
+                <td>for</td>
+                <td>60</td>
+                <td>10</td>
+                </tr>
+                <tr>
+                <th scope="row">Carbon tax is better than cap and trade</th>
+                <td>against</td>
+                <td>any</td>
+                <td>15</td>
+                </tr>
+                <th scope="row">AVERAGE SCORES</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+        </div>     
+
+<!-- div closing the "window-main" -->
+    </div>
+
+<!-- conversation window -->
+<!-- put   style="display:none" back in the div line just below -->
+<div id ="window-talk" style="display:none">
+    <div class ="row">
+    <div class ="col-sm-8">
+        <h1>Ye Olde Tree</h1>
+        <h3>Topic: <span id="current-channel-topic"></span></h3> 
+        <h3>Your position: <span id="current-channel-position"></span></h3>
+    </div>
+    </div>
+
+<!-- the chat window -->
+    <div class="form-group col-sm-8">
+        <div id="conversation-window"></div>  
+    <!-- the input window-->
+        <p>Say your bit:</p>
+        <textarea class="form-control" rows="5" id="conversation-input"></textarea>
+    </div>
+
+    <div class="col-sm-4">
+   
+        <p>Time left:</p>
+        <p>Current Opponent Rating:</p>
+        <p>Your current rating:</p>
+        <p>Opponent location:</p>
+            <!-- get tthis from fb -->
+        <p>Rate your opponent in real time:</p>  
+    </div>
+
+
+<!-- the end conversation button -->        
+        <div class="row">
+        <div class="col-sm-4 col-sm-offset-4">
+            <button type="button" id="btn-end" class="btn btn-lg btn-block btn-primary btn-danger">End Conversation
+            </button>
+        </div>
+        </div>
+        <br></br>
+        <br></br>
+        <!-- when end conversation, prompt "are you sure?" and then box to rate opponent -->
+
+<!-- div closing window-talk -->
+</div>
+
+
+
+</body>
+</html>
