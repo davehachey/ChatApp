@@ -123,6 +123,8 @@ $(document).ready(function() {
 						loggedUser = addNewUser(result, profileRef);
 					}
 				}
+				loadtopics(conversationRef, database);
+				loadmyconversations(conversationsmembersref);
 					});
 			}, function(error) {
 			console.log("Oops! There was an error");
