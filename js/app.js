@@ -5,6 +5,7 @@
 // ready for Javascript to execute
 var loggedUser = {};
 var currentconversation = {};
+var overallaverage = 0;
 
 $(document).ready(function() {
 
@@ -35,7 +36,8 @@ $(document).ready(function() {
 	
 	var conversationRef = database.ref('/conversations');
 	var conversationsmembersref = database.ref('/conversationmembers');
-	var loggedusednumber = database.ref('/loggedusers')
+	var loggedusednumber = database.ref('/loggedusers');
+	var userconvsref = database.ref('/userconversations');
 
 // BUTTONS
 
@@ -79,7 +81,7 @@ $(document).ready(function() {
 					}
 				}
 				loadtopics(conversationRef, database);
-				loadmyconversations(conversationsmembersref);
+				loadmyconversations(userconvsref);
 			});
 		}, function(error) {
 			console.log("Oops! There was an error");
@@ -125,7 +127,7 @@ $(document).ready(function() {
 					}
 				}
 				loadtopics(conversationRef, database);
-				loadmyconversations(conversationsmembersref);
+				loadmyconversations(userconvsref);
 					});
 			}, function(error) {
 			console.log("Oops! There was an error");
@@ -145,8 +147,10 @@ $(document).ready(function() {
 });
 // temp chat button
 	$("#btn-new-chat").click(function() {
+		console.log(overallaverage);
 		var newchat={
 			topic: $("#new-chat-topic").val(), 
+			requesterrating: overallaverage,
 			side: $("#new-chat-side").val(),
 			rating: $("#new-chat-rating").val(),
 			length: $("#new-chat-length").val(),
@@ -166,6 +170,21 @@ $(document).ready(function() {
 
 		var userconversationsref=database.ref("/userconversations");
 		var pushedmember=userconversationsref.child(loggedUser.id).child(currentconversation.id).update({side:currentconversation.side,topic:currentconversation.topic,id:currentconversation.id});
+		chatref.child(currentconversation.id).on("value",function(snapshot){
+			var thevalues=snapshot.val();
+			if(thevalues.accepted==true){
+				currentconversation=thevalues;
+				console.log(currentconversation);
+				console.log(snapshot)
+				currentconversation.id=snapshot.key;
+
+				$("#window-main").hide();
+				$("#window-talk").show();
+				loadmessages(database);	
+
+			}
+		});
+
 
 /*  changed how we were sturcturing our data
 
@@ -176,9 +195,7 @@ $(document).ready(function() {
 		$("#current-channel-topic").html(currentconversation.topic);
 		$("#current-channel-position").html(currentconversation.side);
 
-
-		$("#window-main").hide();
-		$("#window-talk").show();		
+	
 	});
 
 
@@ -206,6 +223,8 @@ $(document).ready(function() {
 
 	$("#conversation-input").keypress(function(e){
 		if(e.which==13){
+			console.log(currentconversation);
+			console.log(loggedUser);
 			var messageref=database.ref("/conversationmessages");
 			messageref.child(currentconversation.id).push(loggedUser.name+": "+$("#conversation-input").val());
 			$("#conversation-input").val("");
@@ -317,6 +336,7 @@ function loadtopics(ref, database){
 				$("#available-topics").append(`
 								<tr>
 		                        <th scope="row">${topicsvalue[keys[i]].topic}</th>
+		                        <td>${topicsvalue[keys[i]].requesterrating}</td>
 		                        <td>${topicsvalue[keys[i]].side}</td>
 		                        <td>${topicsvalue[keys[i]].rating}</td>
 		                        <td>${topicsvalue[keys[i]].length}</td>
@@ -325,7 +345,6 @@ function loadtopics(ref, database){
 		                        </td>
 
 		                        </tr>
-				
 				`);	
 			}
 		}
@@ -337,23 +356,30 @@ function loadtopics(ref, database){
 			var conversationsmembersref=database.ref("/conversationmembers").child(convoid);
 			conversationsmembersref.push(loggedUser.id);
 			chatref.child(convoid).once("value", function(snapshot){
-				currentconversation=snapshot.val();
-				currentconversation.id=convoid;
+				var theconversation=snapshot.val();
+				if (overallaverage>=theconversation.rating){
+					currentconversation=theconversation;
+					currentconversation.id=convoid;
+						
+					$("#current-channel-topic").html(currentconversation.topic);
+					$("#current-channel-position").html(currentconversation.side);
+					$("#window-main").hide();
+					$("#window-talk").show();	
 					
-				$("#current-channel-topic").html(currentconversation.topic);
-				$("#current-channel-position").html(currentconversation.side);
-				$("#window-main").hide();
-				$("#window-talk").show();	
-				
-				var pushedmember=membersref.child(currentconversation.id).update({side:currentconversation.side,topic:currentconversation.topic,id:currentconversation.id});
-				chatref.child(convoid).update({ 
-					accepted:true
-				});
-				chatref.child(convoid).child("members").push(loggedUser.name);
-				loadmessages(database);
+					var pushedmember=membersref.child(currentconversation.id).update({side:currentconversation.side,topic:currentconversation.topic,id:currentconversation.id});
+					chatref.child(convoid).update({ 
+						accepted:true
+					});
+					chatref.child(convoid).child("members").push(loggedUser.name);
+					loadmessages(database);
+				}
+				else {
+					alert("your rating is not high enough to join this conversation!");
+				}
+
 			})
 			
-		});
+		})
 	});
 
 }
@@ -364,21 +390,62 @@ function loadmyconversations(ref){
 		console.log(topicsvalue);
 		var keys=Object.keys(topicsvalue);
 		$("#my-conversations").html("");
+
+		var knowledgetotal=0;
+		var demeanortotal=0;
+		var humourtotal=0;
+		var overalltotal=0;
+		var counter=0;
+
+
 		for (var i=0; i<keys.length;i++){
 
-		$("#my-conversations").append(`
+			$("#my-conversations").append(`
 						<tr>
                         <th scope="row">${topicsvalue[keys[i]].topic}</th>
                         <td>${topicsvalue[keys[i]].side}</td>
                         <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>${topicsvalue[keys[i]].knowledge}</td>
+                        <td>${topicsvalue[keys[i]].demeanor}</td>
+                        <td>${topicsvalue[keys[i]].humour}</td>
+                        <td>${topicsvalue[keys[i]].overall}</td>
 
                         </tr>
 		
-		`);	
+			`);	
+			if(topicsvalue[keys[i]].knowledge!==undefined){
+				knowledgetotal+=parseInt(topicsvalue[keys[i]].knowledge);
+				demeanortotal+=parseInt(topicsvalue[keys[i]].demeanor);
+				humourtotal+=parseInt(topicsvalue[keys[i]].humour);
+				overalltotal+=parseInt(topicsvalue[keys[i]].overall);
+				counter++;
+			}
+// end of for loop is the curly below
+		}
+		if(counter>0){
+			console.log('overalltotal');
+			console.log(overalltotal);
+			console.log(counter);
+			var knowledgeaverage=knowledgetotal/counter;
+			var demeanoraverage=demeanortotal/counter;	
+			var humouraverage=humourtotal/counter;	
+			overallaverage=overalltotal/counter;
+		
+
+
+			$("#my-conversations").append(`
+						<tr>
+                        <th>AVERAGE</th>
+                        <td></td>
+                        <td></td>
+                        <td>${knowledgeaverage}</td>
+                        <td>${demeanoraverage}</td>
+                        <td>${humouraverage}</td>
+                        <td>${overallaverage}</td>
+
+                        </tr>
+		
+			`);	
 		}
 	});
 }
