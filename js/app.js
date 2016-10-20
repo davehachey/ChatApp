@@ -35,7 +35,7 @@ $(document).ready(function() {
 	
 	var conversationRef = database.ref('/conversations');
 	var conversationsmembersref = database.ref('/conversationmembers');
-
+	var loggedusednumber = database.ref('/loggedusers')
 
 // BUTTONS
 
@@ -50,6 +50,7 @@ $(document).ready(function() {
 			profileRef.once("value").then(function(snapshot) {
 				// get the snapshot value
 				var snapshotValue = snapshot.val();
+				console.log(snapshotValue);
 				// if no values present, just add the user
 				if (snapshotValue == undefined || snapshotValue == null) {
 					loggedUser = addNewUser(result, profileRef);
@@ -149,17 +150,28 @@ $(document).ready(function() {
 			side: $("#new-chat-side").val(),
 			rating: $("#new-chat-rating").val(),
 			length: $("#new-chat-length").val(),
-			accepted: false
+			accepted: false,
+			members: [loggedUser.name]
 
 		}
 
 		var chatref=database.ref("/conversations");
 		var pushedchat=chatref.push(newchat);
-		currenconversation=newchat;
+		currentconversation=newchat;
 		currentconversation.id=pushedchat.key;
-		var membersref=database.ref("/conversationmembers");
-		var pushedmember=membersref.child(loggedUser.id).push({side:currentconversation.side,topic:currentconversation.topic,id:currentconversation.id});
+		console.log(loggedUser)
 		console.log(currentconversation);
+		var conversationsmembersref=database.ref("/conversationmembers").child(currentconversation.id);
+		conversationsmembersref.push(loggedUser.id);
+
+		var userconversationsref=database.ref("/userconversations");
+		var pushedmember=userconversationsref.child(loggedUser.id).child(currentconversation.id).update({side:currentconversation.side,topic:currentconversation.topic,id:currentconversation.id});
+
+/*  changed how we were sturcturing our data
+
+		var membersref=database.ref("/conversationmembers");
+		var pushedmember=membersref.child(currentconversation.id).push({side:currentconversation.side,topic:currentconversation.topic,id:currentconversation.id});
+	*/	
 
 		$("#current-channel-topic").html(currentconversation.topic);
 		$("#current-channel-position").html(currentconversation.side);
@@ -172,10 +184,15 @@ $(document).ready(function() {
 
 
 // end conversation button
+	
 	$("#btn-end").click(function() {
 		$("#window-main").show();
 		$("#window-talk").hide();		
 	});
+
+
+
+
 	$("#btn-logout").click(function() {
 		console.log("click");
 		firebase.auth().signOut().then(function() {
@@ -196,6 +213,78 @@ $(document).ready(function() {
 		}
 
 	})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//THIS IS NEW
+// Pushing the ratings to firebase upon clicking the finish and submit button
+$(".btn-submit").click(function() {
+			var convoid=currentconversation.id;	
+			var chatref=database.ref("/conversationmembers");
+			var membersref=database.ref("/userconversations");
+
+
+			chatref.child(convoid).once("value", function(snapshot){
+				var theconversation=snapshot.val();
+				var keys=Object.keys(theconversation);
+				console.log(theconversation);
+				for (var i=0; i<keys.length;i++){
+					console.log(theconversation[keys[i]]);
+					if(theconversation[keys[i]]!==loggedUser.id){
+				membersref.child(theconversation[keys[i]]).child(convoid).update({
+					knowledge: $("#chat-rating-knowledge").val(), 
+					demeanor: $("#chat-rating-demeanor").val(), 
+					humour: $("#chat-rating-humour").val(), 
+					overall: $("#chat-rating-overall").val()
+
+
+				});
+					}
+				}
+
+
+				// currentconversation.id=convoid;
+				// var pushedmember=membersref.child(loggedUser.id).push({knowledge:currentconversation.knowledge,demeanor:currentconversation.demeanor,humour:currentconversation.humour,overall:currentconversation.overall,id:currentconversation.id});	
+				// $("#chat-rating-knowledge").html(currentconversation.knowledge);
+				// $("#chat-rating-demeanor").html(currentconversation.demeanor);
+				// $("#chat-rating-humour").html(currentconversation.humour);
+				// $("#chat-rating-overall").html(currentconversation.overall);
+				// $("#window-main").hide();
+				// $("#window-talk").show();	
+				// loadmessages(database);
+
+			})
+			
+		});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -223,36 +312,45 @@ function loadtopics(ref, database){
 		var keys=Object.keys(topicsvalue);
 		$("#available-topics").html("");
 		for (var i=0; i<keys.length;i++){
+			if(topicsvalue[keys[i]].accepted==false){
 
-		$("#available-topics").append(`
-						<tr>
-                        <th scope="row">${topicsvalue[keys[i]].topic}</th>
-                        <td>${topicsvalue[keys[i]].side}</td>
-                        <td>${topicsvalue[keys[i]].rating}</td>
-                        <td>${topicsvalue[keys[i]].length}</td>
-                        <td>
-                        <button class="btn btn-block btn-join" data-id="${keys[i]}">Join</button>
-                        </td>
+				$("#available-topics").append(`
+								<tr>
+		                        <th scope="row">${topicsvalue[keys[i]].topic}</th>
+		                        <td>${topicsvalue[keys[i]].side}</td>
+		                        <td>${topicsvalue[keys[i]].rating}</td>
+		                        <td>${topicsvalue[keys[i]].length}</td>
+		                        <td>
+		                        <button class="btn btn-block btn-join" data-id="${keys[i]}">Join</button>
+		                        </td>
 
-                        </tr>
-		
-		`);	
+		                        </tr>
+				
+				`);	
+			}
 		}
 
 		$(".btn-join").click(function() {
 			var convoid=$(this).data("id");	
 			var chatref=database.ref("/conversations");
-			var membersref=database.ref("/conversationmembers");
+			var membersref=database.ref("/userconversations").child(loggedUser.id);
+			var conversationsmembersref=database.ref("/conversationmembers").child(convoid);
+			conversationsmembersref.push(loggedUser.id);
 			chatref.child(convoid).once("value", function(snapshot){
 				currentconversation=snapshot.val();
 				currentconversation.id=convoid;
-				var pushedmember=membersref.child(loggedUser.id).push({side:currentconversation.side,topic:currentconversation.topic,id:currentconversation.id});	
+					
 				$("#current-channel-topic").html(currentconversation.topic);
 				$("#current-channel-position").html(currentconversation.side);
 				$("#window-main").hide();
 				$("#window-talk").show();	
+				
+				var pushedmember=membersref.child(currentconversation.id).update({side:currentconversation.side,topic:currentconversation.topic,id:currentconversation.id});
+				chatref.child(convoid).update({ 
+					accepted:true
+				});
+				chatref.child(convoid).child("members").push(loggedUser.name);
 				loadmessages(database);
-
 			})
 			
 		});

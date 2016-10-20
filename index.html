@@ -230,13 +230,55 @@
     </div>
 
 
-<!-- the end conversation button -->        
-        <div class="row">
-        <div class="col-sm-4 col-sm-offset-4">
-            <button type="button" id="btn-end" class="btn btn-lg btn-block btn-primary btn-danger">End Conversation
+<!-- the end conversation button and opponent rating -->        
+        
+        <div class="row col-sm-4 col-sm-offset-4">
+            <button type="button" class="btn btn-lg btn-block btn-primary btn-danger" data-toggle="modal" data-target=".bd-example-modal-lg"">End Conversation
             </button>
+            <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <h3>Rate Your Opponent (1-100)</h3>
+                        <div class="form-group row">
+                            <label class="col-xs-2 col-form-label">Knowledge</label>
+                            <div class="col-xs-2">                
+                                <input class="form-control" type="text" id="chat-rating-knowledge">
+                            </div>
+                                
+                            <div class="form-group row">
+                                <label class="col-xs-2 col-form-label">Demeanor</label>
+                                <div class="col-xs-2">                
+                                    <input class="form-control" type="text" id="chat-rating-demeanor">
+                                </div>
+                            </div> 
+                                    
+                            <div class="form-group row">
+                                <label class="col-xs-2 col-form-label">Humour</label>
+                                <div class="col-xs-2">                
+                                    <input class="form-control" type="text" id="chat-rating-humour">
+                                </div>
+                            </div>
+                                    
+                            <div class="form-group row">
+                                <label class="col-xs-2 col-form-label">Overall</label>
+                                <div class="col-xs-2">                
+                                    <input class="form-control" type="text" id="chat-rating-overall">
+                                </div>
+                            </div>
+                        
+
+                            <button type="button" id="btn-end" class="btn btn-submit btn-lg btn-block btn-primary btn-danger" data-toggle="modal" data-target=".bd-example-modal-lg"">Finish and Submit
+                            </button>
+
+                             <button type="button" id="btn-end" class="btn btn-lg btn-block btn-primary btn-danger" data-toggle="modal" data-target=".bd-example-modal-lg"">Return to conversation
+                            </button>
+                        </div>
+                    </div>
+                </div>            
+            </div>
         </div>
-        </div>
+
+
         <br></br>
         <br></br>
         <!-- when end conversation, prompt "are you sure?" and then box to rate opponent -->
