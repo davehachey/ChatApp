@@ -178,6 +178,17 @@ $(document).ready(function() {
 				console.log(snapshot)
 				currentconversation.id=snapshot.key;
 
+				var clock = parseInt(currentconversation.length)*60;
+						var timeinterval = setInterval(function(){
+						$("#timer").html(clock);
+						   	if(clock<=0){
+						   	
+						    clearInterval(timeinterval);
+
+						   }
+						   clock--;
+						 },1000);
+
 				$("#window-main").hide();
 				$("#window-talk").show();
 				loadmessages(database);	
@@ -265,17 +276,16 @@ $(".btn-submit").click(function() {
 				for (var i=0; i<keys.length;i++){
 					console.log(theconversation[keys[i]]);
 					if(theconversation[keys[i]]!==loggedUser.id){
-				membersref.child(theconversation[keys[i]]).child(convoid).update({
-					knowledge: $("#chat-rating-knowledge").val(), 
-					demeanor: $("#chat-rating-demeanor").val(), 
-					humour: $("#chat-rating-humour").val(), 
-					overall: $("#chat-rating-overall").val()
+						membersref.child(theconversation[keys[i]]).child(convoid).update({
+							knowledge: $("#chat-rating-knowledge").val(), 
+							demeanor: $("#chat-rating-demeanor").val(), 
+							humour: $("#chat-rating-humour").val(), 
+							overall: $("#chat-rating-overall").val()
 
 
-				});
+						});
 					}
 				}
-
 
 				// currentconversation.id=convoid;
 				// var pushedmember=membersref.child(loggedUser.id).push({knowledge:currentconversation.knowledge,demeanor:currentconversation.demeanor,humour:currentconversation.humour,overall:currentconversation.overall,id:currentconversation.id});	
@@ -361,17 +371,39 @@ function loadtopics(ref, database){
 					currentconversation=theconversation;
 					currentconversation.id=convoid;
 						
-					$("#current-channel-topic").html(currentconversation.topic);
-					$("#current-channel-position").html(currentconversation.side);
-					$("#window-main").hide();
-					$("#window-talk").show();	
 					
-					var pushedmember=membersref.child(currentconversation.id).update({side:currentconversation.side,topic:currentconversation.topic,id:currentconversation.id});
+
+					var newside="For";
+
+					if (currentconversation.side=="For"){
+						newside="Against";
+
+					}
+					currentconversation.side=newside;
+
+					var pushedmember=membersref.child(currentconversation.id).update({side:newside,topic:currentconversation.topic,id:currentconversation.id});
 					chatref.child(convoid).update({ 
 						accepted:true
 					});
 					chatref.child(convoid).child("members").push(loggedUser.name);
 					loadmessages(database);
+
+						var clock = parseInt(currentconversation.length)*60;
+						var timeinterval = setInterval(function(){
+						$("#timer").html(clock);
+						   	if(clock<=0){
+						   	
+						    clearInterval(timeinterval);
+
+						   }
+						   clock--;
+						 },1000);
+
+					$("#current-channel-topic").html(currentconversation.topic);
+					$("#current-channel-position").html(currentconversation.side);
+					$("#window-main").hide();
+					$("#window-talk").show();	
+
 				}
 				else {
 					alert("your rating is not high enough to join this conversation!");

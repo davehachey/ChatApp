@@ -1,3 +1,14 @@
+
+<!-- Features Dropped
+conversations ended prematurely penalty
+current # of users online
+opponent location
+Real time rating
+opponent rating in chat window
+-->
+
+
+
 <!doctype html>
 <html>
     <head>
@@ -202,7 +213,7 @@
 
     <div class="col-sm-4">
    
-        <p>Time left:</p>
+        <p>Time left:<span id="timer"></span></p>
         <!--
         <p>Current Opponent Rating:</p>
         <p>Your current rating:</p>
@@ -215,7 +226,7 @@
 <!-- the end conversation button and opponent rating -->        
         
         <div class="row col-sm-4 col-sm-offset-4">
-            <button type="button" class="btn btn-lg btn-block btn-primary btn-danger" data-toggle="modal" data-target=".bd-example-modal-lg"">End Conversation
+            <button type="button" id="btn-endconversation" class="btn btn-lg btn-block btn-primary btn-danger" data-toggle="modal" data-target=".bd-example-modal-lg"">End Conversation
             </button>
             <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
